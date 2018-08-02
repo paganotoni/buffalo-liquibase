@@ -1,6 +1,14 @@
-# github.com/paganotoni/buffalo-liquibase
+# buffalo-liquibase
 
-TODO: Description
+This plugin is intended to help you working with liquibase and buffalo.
+
+# Limitations
+
+
+
+- It depends on liquibase installation
+- Its focused on Mac
+- Its focused on Postgresql
 
 ## Installation
 
