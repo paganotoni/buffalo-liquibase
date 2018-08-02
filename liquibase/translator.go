@@ -16,6 +16,7 @@ import (
 	"github.com/pkg/errors"
 )
 
+//Translator takes the job of translating fizz migrations
 type Translator struct {
 	path       string
 	migrations []pop.Migration
@@ -65,8 +66,7 @@ func (t *Translator) Translate() error {
 	fmt.Printf("Found %v migrations in %v\n", len(t.migrations), t.path)
 
 	for _, mi := range t.migrations {
-
-		err := t.TranslateMigration(mi, t.findDownFor(mi))
+		err := t.translateMigration(mi, t.findDownFor(mi))
 		if err != nil {
 			return err
 		}
@@ -88,7 +88,7 @@ func (t *Translator) findDownFor(mi pop.Migration) pop.Migration {
 	return pop.Migration{}
 }
 
-func (t *Translator) TranslateMigration(up, down pop.Migration) error {
+func (t *Translator) translateMigration(up, down pop.Migration) error {
 	upsql, err := t.convertMigration(up)
 	if err != nil {
 		return err
