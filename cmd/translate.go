@@ -26,11 +26,6 @@ var translateCmd = &cobra.Command{
 	Short:   "description about this plugin",
 	Aliases: []string{"t"},
 	RunE: func(cmd *cobra.Command, args []string) error {
-
-		// if len(args) == 0 {
-		// 	return errors.New("you must specify the dialect (postgres, sqlite, mysql)")
-		// }
-
 		t := NewTranslator(fizzMigrationsPath)
 		cmd.Printf("Migrations: %v\n", len(t.migrations))
 
