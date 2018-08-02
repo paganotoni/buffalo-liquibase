@@ -31,7 +31,6 @@ var setupCmd = &cobra.Command{
 		c.Stderr = os.Stderr
 		c.Stdout = os.Stdout
 		return c.Run()
-
 	},
 }
 
