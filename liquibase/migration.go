@@ -21,11 +21,12 @@ type Migration struct {
 func (m *Migration) XML() (string, error) {
 	result, err := xml.MarshalIndent(DatabaseChangeLog{
 		ChangeSet: ChangeSet{
-			Author: "buffalo-liquibase",
-			ID:     fmt.Sprintf("%v-%v", m.Version, m.Name),
-			UpSQL:  m.UpSQL,
+			Author:  "buffalo-liquibase",
+			ID:      fmt.Sprintf("%v-%v", m.Version, m.Name),
+			UpSQL:   m.UpSQL,
+			DownSQL: m.DownSQL,
 		},
-		DownSQL:        m.DownSQL,
+
 		Ns:             "http://www.liquibase.org/xml/ns/dbchangelog",
 		Xsi:            "http://www.w3.org/2001/XMLSchema-instance",
 		Ext:            "http://www.liquibase.org/xml/ns/dbchangelog-ext",
