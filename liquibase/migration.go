@@ -19,8 +19,8 @@ type Migration struct {
 }
 
 func (m *Migration) XML() (string, error) {
-	result, err := xml.MarshalIndent(DatabaseChangeLog{
-		ChangeSet: ChangeSet{
+	result, err := xml.MarshalIndent(databaseChangeLog{
+		ChangeSet: changeSet{
 			Author:  "buffalo-liquibase",
 			ID:      fmt.Sprintf("%v-%v", m.Version, m.Name),
 			UpSQL:   m.UpSQL,

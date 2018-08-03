@@ -13,8 +13,9 @@ var generatePath string
 
 //generate a sample liquibase migration in /migrations or --path
 var generateCmd = &cobra.Command{
-	Use:   "generate",
-	Short: "Generates a new liquibase xml migration",
+	Use:     "generate",
+	Short:   "Generates a new liquibase xml migration",
+	Aliases: []string{"g"},
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if len(args) == 0 {
 			return errors.New("You must provide a name for the migration")
