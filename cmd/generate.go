@@ -26,7 +26,7 @@ var generateCmd = &cobra.Command{
 			Version: time.Now().UTC().Format("20060102150405"),
 		}
 
-		return migration.Write()
+		return migration.Write(generatePath)
 	},
 }
 

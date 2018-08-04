@@ -7,6 +7,7 @@ import (
 	"html/template"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 )
 
 type Migration struct {
@@ -40,28 +41,18 @@ func (m *Migration) XML() (string, error) {
 	return html.UnescapeString(string(result)), nil
 }
 
-func (m Migration) Write() error {
+func (m Migration) Write(path string) error {
 	content, err := m.XML()
 
 	if err != nil {
 		return err
 	}
-	if _, err := os.Stat("./migrations"); os.IsNotExist(err) {
-		os.Mkdir("./migrations", 0777)
+
+	if path == "./migrations" {
+		if _, err := os.Stat("./migations"); os.IsNotExist(err) {
+			os.Mkdir(path, 0777)
+		}
 	}
 
-	return ioutil.WriteFile(fmt.Sprintf("./migrations/%v-%v.xml", m.Version, m.Name), []byte(content), 0644)
+	return ioutil.WriteFile(fmt.Sprintf(filepath.Join(path, "%v-%v.xml"), m.Version, m.Name), []byte(content), 0644)
 }
-
-// const XMLmigrationTemplate = `
-// <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.0.xsd http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
-// 	<changeSet author="buffalo-liquibase" id="{{.Version}}-{{.Name}}">
-//         <sql>
-// {{.UpSQL}}
-// 		</sql>
-// 		<rollback>
-// {{.DownSQL}}
-// 	    </rollback>
-//     </changeSet>
-// </databaseChangeLog>
-// `

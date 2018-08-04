@@ -6,6 +6,7 @@ import (
 )
 
 var fizzMigrationsPath string
+var translatePath string
 
 // translateCmd translates fizz into liquibase
 var translateCmd = &cobra.Command{
@@ -14,11 +15,12 @@ var translateCmd = &cobra.Command{
 	Aliases: []string{"t"},
 	RunE: func(cmd *cobra.Command, args []string) error {
 		t := liquibase.NewTranslator(fizzMigrationsPath)
-		return t.Translate()
+		return t.Translate(translatePath)
 	},
 }
 
 func init() {
 	translateCmd.PersistentFlags().StringVar(&fizzMigrationsPath, "path", "./migrations", "lets change the folder where fizz migrations are")
+	translateCmd.PersistentFlags().StringVar(&translatePath, "output", "./migrations", "lets change the folder migrations will be outputed")
 	liquibaseCmd.AddCommand(translateCmd)
 }

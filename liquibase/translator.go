@@ -29,11 +29,11 @@ func NewTranslator(path string) Translator {
 	return t
 }
 
-func (t *Translator) Translate() error {
+func (t *Translator) Translate(path string) error {
 	fmt.Printf("Found %v migrations in %v\n", len(t.migrations), t.path)
 
 	for _, mi := range t.migrations {
-		err := mi.Write()
+		err := mi.Write(path)
 		if err != nil {
 			return err
 		}
