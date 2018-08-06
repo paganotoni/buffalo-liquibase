@@ -13,6 +13,7 @@ import (
 
 var changeLogFile string
 var environment string
+var databaseYmlFile string
 
 // upCmd runs /migrations or --path up against buffalo db with liquibase
 var upCmd = &cobra.Command{
@@ -23,7 +24,7 @@ var upCmd = &cobra.Command{
 			return errors.New("could not find liquibase, run setup first")
 		}
 
-		if _, err := os.Stat("database.yml"); os.IsNotExist(err) {
+		if _, err := os.Stat(databaseYmlFile); os.IsNotExist(err) {
 			return errors.New("please run this command in your buffalo app root")
 		}
 
@@ -61,6 +62,7 @@ var upCmd = &cobra.Command{
 
 func init() {
 	upCmd.PersistentFlags().StringVar(&changeLogFile, "c", "./migrations/changelog.xml", "migrations changelog")
-	upCmd.PersistentFlags().StringVar(&environment, "e", "development", "migrations changelog")
+	upCmd.PersistentFlags().StringVar(&environment, "e", "development", "environment to run the migrations against")
+	upCmd.PersistentFlags().StringVar(&databaseYmlFile, "d", "./database.yml", "database.yml file")
 	liquibaseCmd.AddCommand(upCmd)
 }
