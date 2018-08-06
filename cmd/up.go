@@ -12,6 +12,7 @@ import (
 )
 
 var changeLogFile string
+var environment string
 
 // upCmd runs /migrations or --path up against buffalo db with liquibase
 var upCmd = &cobra.Command{
@@ -30,7 +31,7 @@ var upCmd = &cobra.Command{
 			return err
 		}
 
-		originalURL := pop.Connections["development"].URL()
+		originalURL := pop.Connections[environment].URL()
 		r := regexp.MustCompile(`postgres:\/\/(?P<username>.*):(?P<password>.*)@(?P<host>.*):(?P<port>.*)\/(?P<database>.*)\?.*`)
 		match := r.FindStringSubmatch(originalURL)
 		URL := fmt.Sprintf("jdbc:postgresql://%v:%v/%v?ssl=true&sslfactory=org.postgresql.ssl.NonValidatingFactory", match[3], match[4], match[5])
@@ -55,5 +56,6 @@ var upCmd = &cobra.Command{
 
 func init() {
 	translateCmd.PersistentFlags().StringVar(&changeLogFile, "c", "./migrations/changelog.xml", "migrations changelog")
+	translateCmd.PersistentFlags().StringVar(&environment, "e", "development", "migrations changelog")
 	liquibaseCmd.AddCommand(upCmd)
 }
