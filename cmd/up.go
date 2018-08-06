@@ -55,7 +55,7 @@ var upCmd = &cobra.Command{
 }
 
 func init() {
-	translateCmd.PersistentFlags().StringVar(&changeLogFile, "c", "./migrations/changelog.xml", "migrations changelog")
-	translateCmd.PersistentFlags().StringVar(&environment, "e", "development", "migrations changelog")
+	upCmd.PersistentFlags().StringVar(&changeLogFile, "c", "./migrations/changelog.xml", "migrations changelog")
+	upCmd.PersistentFlags().StringVar(&environment, "e", "development", "migrations changelog")
 	liquibaseCmd.AddCommand(upCmd)
 }
