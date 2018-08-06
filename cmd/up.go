@@ -31,7 +31,12 @@ var upCmd = &cobra.Command{
 			return err
 		}
 
-		originalURL := pop.Connections[environment].URL()
+		env := pop.Connections[environment]
+		if env == nil {
+			return fmt.Errorf("could not find %v environment in your database.yml", environment)
+		}
+
+		originalURL := env.URL()
 		r := regexp.MustCompile(`postgres:\/\/(?P<username>.*):(?P<password>.*)@(?P<host>.*):(?P<port>.*)\/(?P<database>.*)\?.*`)
 		match := r.FindStringSubmatch(originalURL)
 		URL := fmt.Sprintf("jdbc:postgresql://%v:%v/%v?ssl=true&sslfactory=org.postgresql.ssl.NonValidatingFactory", match[3], match[4], match[5])
