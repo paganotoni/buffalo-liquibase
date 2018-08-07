@@ -15,7 +15,7 @@ var setupCmd = &cobra.Command{
 	Short: "description about this plugin",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if _, err := exec.LookPath("liquibase"); err == nil {
-			cmd.Printf("Found liquibase, all good.")
+			cmd.Printf("Found liquibase, all good.\n")
 			return nil
 		}
 
