@@ -6,8 +6,10 @@ import (
 	"os"
 	"os/exec"
 	"regexp"
+	"strings"
 
 	"github.com/gobuffalo/pop"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -39,13 +41,13 @@ var upCmd = &cobra.Command{
 
 		originalURL := env.URL()
 
-		r := regexp.MustCompile(`postgres:\/\/(?P<username>.*):(?P<password>.*)@(?P<host>.*):(?P<port>.*)\/(?P<database>.*)\?.*`)
+		r := regexp.MustCompile(`postgres:\/\/(?P<username>.*):(?P<password>.*)@(?P<host>.*):(?P<port>.*)\/(?P<database>.*)\?(?P<extras>.*)`)
 		match := r.FindStringSubmatch(originalURL)
 		if match == nil {
 			return fmt.Errorf("could not convert %v url into liquibase", environment)
 		}
 
-		URL := fmt.Sprintf("jdbc:postgresql://%v:%v/%v?ssl=true&sslfactory=org.postgresql.ssl.NonValidatingFactory", match[3], match[4], match[5])
+		URL := fmt.Sprintf("jdbc:postgresql://%v:%v/%v?%v", match[3], match[4], match[5], match[6])
 
 		runArgs := []string{
 			"--driver=org.postgresql.Driver",
@@ -58,6 +60,10 @@ var upCmd = &cobra.Command{
 		}
 
 		c := exec.Command("liquibase", runArgs...)
+
+		logrus.Print("liquibase")
+		logrus.Println(strings.Join(runArgs, " "))
+
 		c.Stdin = os.Stdin
 		c.Stderr = os.Stderr
 		c.Stdout = os.Stdout
