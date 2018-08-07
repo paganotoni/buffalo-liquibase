@@ -16,6 +16,7 @@ var setupCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if _, err := exec.LookPath("liquibase"); err == nil {
 			cmd.Printf("Found liquibase, all good.")
+			return nil
 		}
 
 		if runtime.GOOS != "darwin" {
