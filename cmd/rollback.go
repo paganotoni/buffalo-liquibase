@@ -6,19 +6,18 @@ import (
 	"os"
 	"os/exec"
 	"regexp"
+	"strconv"
 
 	"github.com/gobuffalo/pop"
 	"github.com/spf13/cobra"
 )
 
-var changeLogFile string
-var environment string
-var databaseYmlFile string
+var rollbackCount int
 
-// upCmd runs /migrations or --path up against buffalo db with liquibase
-var upCmd = &cobra.Command{
-	Use:   "up",
-	Short: "runs liquibase migrations",
+// rollbackCmd runs /migrations down
+var rollbackCmd = &cobra.Command{
+	Use:   "rollback",
+	Short: "rollbacks migrations",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if _, err := exec.LookPath("liquibase"); err != nil {
 			return errors.New("could not find liquibase, run setup first")
@@ -54,8 +53,11 @@ var upCmd = &cobra.Command{
 			"--username=" + match[1],
 			"--password=" + match[2],
 			"--changeLogFile=" + changeLogFile,
-			"update",
+			"rollbackCount",
+			strconv.Itoa(rollbackCount),
 		}
+
+		cmd.Println(runArgs)
 
 		c := exec.Command("liquibase", runArgs...)
 		c.Stdin = os.Stdin
@@ -66,8 +68,9 @@ var upCmd = &cobra.Command{
 }
 
 func init() {
-	upCmd.PersistentFlags().StringVar(&changeLogFile, "c", "./migrations/changelog.xml", "migrations changelog")
-	upCmd.PersistentFlags().StringVar(&environment, "e", "development", "environment to run the migrations against")
-	upCmd.PersistentFlags().StringVar(&databaseYmlFile, "d", "./database.yml", "database.yml file")
-	liquibaseCmd.AddCommand(upCmd)
+	rollbackCmd.PersistentFlags().IntVar(&rollbackCount, "n", 1, "number of migrations to run down")
+	rollbackCmd.PersistentFlags().StringVar(&changeLogFile, "c", "./migrations/changelog.xml", "migrations changelog")
+	rollbackCmd.PersistentFlags().StringVar(&environment, "e", "development", "environment to run the migrations against")
+	rollbackCmd.PersistentFlags().StringVar(&databaseYmlFile, "d", "./database.yml", "database.yml file")
+	liquibaseCmd.AddCommand(rollbackCmd)
 }
