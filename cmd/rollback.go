@@ -2,13 +2,12 @@ package cmd
 
 import (
 	"errors"
-	"fmt"
 	"os"
 	"os/exec"
-	"regexp"
 	"strconv"
 
 	"github.com/gobuffalo/pop"
+	"github.com/paganotoni/buffalo-liquibase/liquibase"
 	"github.com/spf13/cobra"
 )
 
@@ -23,39 +22,20 @@ var rollbackCmd = &cobra.Command{
 			return errors.New("could not find liquibase, run setup first")
 		}
 
-		if _, err := os.Stat(databaseYmlFile); os.IsNotExist(err) {
-			return errors.New("please run this command in your buffalo app root")
-		}
-
 		if err := pop.LoadConfigFile(); err != nil {
 			return err
 		}
 
-		env := pop.Connections[environment]
-		if env == nil {
-			return fmt.Errorf("could not find %v environment in your database.yml", environment)
+		runArgs, err := liquibase.BuildRunArgsFor(environment)
+		if err != nil {
+			return err
 		}
 
-		originalURL := env.URL()
-
-		r := regexp.MustCompile(`postgres:\/\/(?P<username>.*):(?P<password>.*)@(?P<host>.*):(?P<port>.*)\/(?P<database>.*)\?(?P<extras>.*)`)
-		match := r.FindStringSubmatch(originalURL)
-		if match == nil {
-			return fmt.Errorf("could not convert %v url into liquibase", environment)
-		}
-
-		URL := fmt.Sprintf("jdbc:postgresql://%v:%v/%v?%v", match[3], match[4], match[5], match[6])
-
-		runArgs := []string{
-			"--driver=org.postgresql.Driver",
-			"--url=" + URL,
-			"--logLevel=debug",
-			"--username=" + match[1],
-			"--password=" + match[2],
+		runArgs = append(runArgs, []string{
 			"--changeLogFile=" + changeLogFile,
 			"rollbackCount",
 			strconv.Itoa(rollbackCount),
-		}
+		}...)
 
 		cmd.Println(runArgs)
 
@@ -71,6 +51,5 @@ func init() {
 	rollbackCmd.PersistentFlags().IntVar(&rollbackCount, "n", 1, "number of migrations to run down")
 	rollbackCmd.PersistentFlags().StringVar(&changeLogFile, "c", "./migrations/changelog.xml", "migrations changelog")
 	rollbackCmd.PersistentFlags().StringVar(&environment, "e", "development", "environment to run the migrations against")
-	rollbackCmd.PersistentFlags().StringVar(&databaseYmlFile, "d", "./database.yml", "database.yml file")
 	liquibaseCmd.AddCommand(rollbackCmd)
 }
