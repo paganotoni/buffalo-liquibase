@@ -2,6 +2,8 @@ package cmd
 
 import (
 	"errors"
+	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/paganotoni/buffalo-liquibase/liquibase"
@@ -20,13 +22,14 @@ var generateCmd = &cobra.Command{
 		if len(args) == 0 {
 			return errors.New("You must provide a name for the migration")
 		}
-
+		nameParts := strings.Split(args[0], "/")
 		migration := liquibase.Migration{
-			Name:    args[0],
+			Name:    nameParts[len(nameParts)-1],
 			Version: time.Now().UTC().Format("20060102150405"),
 		}
 
-		return migration.Write(generatePath)
+		path := append([]string{generatePath}, nameParts[:len(nameParts)-1]...)
+		return migration.Write(filepath.Join(path...))
 	},
 }
 
