@@ -11,10 +11,9 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// setupCmd translates fizz into liquibase
 var setupCmd = &cobra.Command{
 	Use:   "setup",
-	Short: "description about this plugin",
+	Short: "sets up liquibase and postgresql java driver",
 	RunE: func(cmd *cobra.Command, args []string) error {
 
 		if runtime.GOOS != "darwin" {
