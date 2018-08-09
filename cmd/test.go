@@ -21,7 +21,7 @@ var testCmd = &cobra.Command{
 
 		conn := pop.Connections["test"]
 		err := pop.DropDB(conn)
-		if err != nil {
+		if err != nil && !strings.Contains(err.Error(), "does not exist") {
 			return err
 		}
 
