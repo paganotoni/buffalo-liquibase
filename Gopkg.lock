@@ -43,14 +43,6 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:1066d6695183ba0332078e8f8226a817283d86181eed6030e3e7030cc09a5988"
-  name = "github.com/go-xmlfmt/xmlfmt"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "0315779074c2c4d1a4c459fdc5ead14f2043ffe5"
-
-[[projects]]
-  branch = "master"
   digest = "1:e8a9a629c22ae6b42ae92be42e0aee1ea5b64d2db0c2fce334448162576c680c"
   name = "github.com/gobuffalo/buffalo-plugins"
   packages = ["plugins"]
@@ -441,7 +433,6 @@
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
-    "github.com/go-xmlfmt/xmlfmt",
     "github.com/gobuffalo/buffalo-plugins/plugins",
     "github.com/gobuffalo/fizz",
     "github.com/gobuffalo/fizz/translators",

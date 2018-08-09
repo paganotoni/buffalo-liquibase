@@ -27,22 +27,32 @@ var upCmd = &cobra.Command{
 			return err
 		}
 
-		runArgs, err := liquibase.BuildRunArgsFor(environment)
+		c, err := buildUpCommand()
 		if err != nil {
 			return err
 		}
 
-		runArgs = append(runArgs, []string{
-			"--changeLogFile=" + changeLogFile,
-			"update",
-		}...)
-
-		c := exec.Command("liquibase", runArgs...)
-		c.Stdin = os.Stdin
-		c.Stderr = os.Stderr
-		c.Stdout = os.Stdout
 		return c.Run()
 	},
+}
+
+func buildUpCommand() (*exec.Cmd, error) {
+	runArgs, err := liquibase.BuildRunArgsFor(environment)
+	if err != nil {
+		return nil, err
+	}
+
+	runArgs = append(runArgs, []string{
+		"--changeLogFile=" + changeLogFile,
+		"update",
+	}...)
+
+	c := exec.Command("liquibase", runArgs...)
+	c.Stdin = os.Stdin
+	c.Stderr = os.Stderr
+	c.Stdout = os.Stdout
+
+	return c, nil
 }
 
 func init() {
