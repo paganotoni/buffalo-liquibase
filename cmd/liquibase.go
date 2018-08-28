@@ -7,7 +7,7 @@ import (
 // liquibaseCmd represents the liquibase command
 var liquibaseCmd = &cobra.Command{
 	Use:     "liquibase",
-	Short:   "description about this plugin",
+	Short:   "Runs yours migrations using liquibase",
 	Aliases: []string{"lb"},
 }
 

@@ -27,7 +27,7 @@ func BuildRunArgsFor(environment string) ([]string, error) {
 	runArgs := []string{
 		"--driver=org.postgresql.Driver",
 		"--url=" + URL,
-		"--logLevel=debug",
+		"--logLevel=info",
 		"--username=" + match[1],
 		"--password=" + match[2],
 	}

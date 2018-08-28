@@ -17,7 +17,7 @@ var databaseYmlFile string
 // upCmd runs /migrations or --path up against buffalo db with liquibase
 var upCmd = &cobra.Command{
 	Use:   "up",
-	Short: "runs liquibase migrations",
+	Short: "runs liquibase migrations up",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if _, err := exec.LookPath("liquibase"); err != nil {
 			return errors.New("could not find liquibase, run setup first")
@@ -58,5 +58,5 @@ func buildUpCommand() (*exec.Cmd, error) {
 func init() {
 	upCmd.PersistentFlags().StringVar(&changeLogFile, "c", "./migrations/changelog.xml", "migrations changelog")
 	upCmd.PersistentFlags().StringVar(&environment, "e", "development", "environment to run the migrations against")
-	liquibaseCmd.AddCommand(upCmd)
+	migrateCmd.AddCommand(upCmd)
 }
