@@ -21,6 +21,14 @@ var availableCmd = &cobra.Command{
 				Description:    liquibaseCmd.Short,
 				Aliases:        liquibaseCmd.Aliases,
 			},
+
+			{
+				Name:           testCmd.Use,
+				UseCommand:     testCmd.Use,
+				BuffaloCommand: "root",
+				Description:    testCmd.Short,
+				Aliases:        testCmd.Aliases,
+			},
 		}
 		return json.NewEncoder(os.Stdout).Encode(plugs)
 	},
@@ -28,4 +36,5 @@ var availableCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(availableCmd)
+	rootCmd.AddCommand(testCmd)
 }

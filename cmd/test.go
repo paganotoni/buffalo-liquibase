@@ -1,11 +1,13 @@
 package cmd
 
 import (
+	"bytes"
 	"fmt"
 	"os"
 	"os/exec"
 	"strings"
 
+	"github.com/gobuffalo/envy"
 	"github.com/gobuffalo/pop"
 	"github.com/spf13/cobra"
 )
@@ -44,7 +46,11 @@ var testCmd = &cobra.Command{
 		os.Setenv("GO_ENV", "test")
 
 		if len(args) == 0 {
-			args = []string{"./..."}
+			args, err = findTestPackages()
+
+			if err != nil {
+				return err
+			}
 		}
 
 		runArgs := append([]string{"test", "-p", "1"}, args...)
@@ -59,6 +65,19 @@ var testCmd = &cobra.Command{
 	},
 }
 
-func init() {
-	liquibaseCmd.AddCommand(testCmd)
+func findTestPackages() ([]string, error) {
+	args := []string{}
+	out, err := exec.Command(envy.Get("GO_BIN", "go"), "list", "./...").Output()
+	if err != nil {
+		return args, err
+	}
+
+	pkgs := bytes.Split(bytes.TrimSpace(out), []byte("\n"))
+	for _, p := range pkgs {
+		if !strings.Contains(string(p), "/vendor/") {
+			args = append(args, string(p))
+		}
+	}
+
+	return args, err
 }
