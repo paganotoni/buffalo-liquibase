@@ -69,6 +69,7 @@ func (ps PostgresSuite) Test_Prepare() {
 }
 
 func (ps PostgresSuite) Test_CanMigrate() {
+	ps.NoError(ps.Migrator.Prepare())
 	result, err := ps.Migrator.canMigrate()
 	ps.NoError(err)
 	ps.True(result)

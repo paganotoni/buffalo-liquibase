@@ -45,7 +45,7 @@ const (
 // PostgresMigrator is the implementation of the migrator for the postgres
 // database type. At the type i'm writing this there is no need for other
 // kind of migrators but i preffer to leave the door open.
-type PostgresMigrator struct{
+type PostgresMigrator struct {
 	Conn *pop.Connection
 }
 
@@ -106,10 +106,10 @@ func (pm PostgresMigrator) Up() error {
 	}
 
 	//3. Acquire lock in table (write it)
-	// err = pm.lock(environment)
-	// if err != nil {
-	// 	return errors.Wrap(err, "error while locking")
-	// }
+	err = pm.lock()
+	if err != nil {
+		return errors.Wrap(err, "error while locking")
+	}
 
 	//4. Parse migrations
 	//5. Find last migration
