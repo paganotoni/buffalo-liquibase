@@ -52,7 +52,7 @@ type PostgresMigrator struct {
 	log models.DatabaseChangeLog
 }
 
-func (pm PostgresMigrator) ensureTables() error {
+func (pm *PostgresMigrator) ensureTables() error {
 	//Check table existence
 	err := pm.Conn.RawQuery(migrationTablesQuery).Exec()
 	if err == nil {
@@ -68,7 +68,7 @@ func (pm PostgresMigrator) ensureTables() error {
 	return nil
 }
 
-func (pm PostgresMigrator) canMigrate() (bool, error) {
+func (pm *PostgresMigrator) canMigrate() (bool, error) {
 	result := struct {
 		Count int64 `db:"count"`
 	}{}
@@ -77,13 +77,13 @@ func (pm PostgresMigrator) canMigrate() (bool, error) {
 	return result.Count == 0, err
 }
 
-func (pm PostgresMigrator) lock() error {
+func (pm *PostgresMigrator) lock() error {
 	return pm.Conn.Transaction(func(tx *pop.Connection) error {
 		return tx.RawQuery(lockStatement, os.Getpid(), true, "buffalo-liquibase").Exec()
 	})
 }
 
-func (pm PostgresMigrator) Prepare() error {
+func (pm *PostgresMigrator) Prepare() error {
 	err := pm.ensureTables()
 	if err != nil {
 		return err
@@ -92,7 +92,7 @@ func (pm PostgresMigrator) Prepare() error {
 	return nil
 }
 
-func (pm PostgresMigrator) Up() error {
+func (pm *PostgresMigrator) Up() error {
 	//1. Run Prepare
 	if err := pm.Prepare(); err != nil {
 		return err
@@ -121,7 +121,7 @@ func (pm PostgresMigrator) Up() error {
 	return nil
 }
 
-func (pm PostgresMigrator) Down(count int) error {
+func (pm *PostgresMigrator) Down(count int) error {
 	//Run migrations down
 	return nil
 }

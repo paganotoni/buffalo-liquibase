@@ -12,7 +12,7 @@ import (
 type PostgresSuite struct {
 	*suite.Model
 
-	Migrator PostgresMigrator
+	Migrator *PostgresMigrator
 }
 
 func TestPostgres(t *testing.T) {
@@ -35,7 +35,7 @@ func TestPostgres(t *testing.T) {
 	ps := &PostgresSuite{
 		Model: model,
 
-		Migrator: PostgresMigrator{
+		Migrator: &PostgresMigrator{
 			Conn: conn,
 		},
 	}
@@ -51,10 +51,6 @@ func (ps *PostgresSuite) SetupTest() {
 	pop.CreateDB(ps.DB)
 	err := ps.DB.TruncateAll()
 	ps.NoError(err)
-
-	ps.Migrator = PostgresMigrator{
-		Conn: ps.DB,
-	}
 }
 
 func (ps PostgresSuite) Test_Prepare() {
