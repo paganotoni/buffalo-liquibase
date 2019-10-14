@@ -49,7 +49,8 @@ const (
 type PostgresMigrator struct {
 	Conn *pop.Connection
 
-	log models.DatabaseChangeLog
+	changelogPath string
+	log           models.DatabaseChangeLog
 }
 
 func (pm *PostgresMigrator) ensureTables() error {
@@ -80,6 +81,12 @@ func (pm *PostgresMigrator) canMigrate() (bool, error) {
 func (pm *PostgresMigrator) lock() error {
 	return pm.Conn.Transaction(func(tx *pop.Connection) error {
 		return tx.RawQuery(lockStatement, os.Getpid(), true, "buffalo-liquibase").Exec()
+	})
+}
+
+func (pm *PostgresMigrator) unlock() error {
+	return pm.Conn.Transaction(func(tx *pop.Connection) error {
+		return tx.RawQuery("DELETE FROM databasechangeloglock;").Exec()
 	})
 }
 
@@ -114,11 +121,17 @@ func (pm *PostgresMigrator) Up() error {
 		return errors.Wrap(err, "error while locking")
 	}
 
-	//4. Parse migrations
+	//4. Parse migration changelog
+	pm.log, err = Parser{}.ParseXML(pm.changelogPath)
+	if err != nil {
+		return errors.Wrap(err, "error reading changelog")
+	}
+
 	//5. Find last migration
 	//6. Run missing and add to migrations registry
-	//7. Release lock
-	return nil
+
+	//7. Unlocking tables
+	return pm.unlock()
 }
 
 func (pm *PostgresMigrator) Down(count int) error {

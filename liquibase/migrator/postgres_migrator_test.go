@@ -94,3 +94,21 @@ func (ps PostgresSuite) Test_Lock() {
 	ps.True(result.Locked)
 	ps.Equal("buffalo-liquibase", result.LockedBy)
 }
+
+func (ps PostgresSuite) Test_Unlock() {
+	ps.NoError(ps.Migrator.Prepare())
+
+	err := ps.DB.RawQuery("INSERT INTO databasechangeloglock (id, locked) values (1, true);").Exec()
+	ps.NoError(err)
+
+	err = ps.Migrator.unlock()
+	ps.NoError(err)
+
+	result := struct {
+		Count int
+	}{}
+
+	err = ps.DB.RawQuery("SELECT count(*) FROM databasechangeloglock;").First(&result)
+	ps.NoError(err)
+	ps.Equal(0, result.Count)
+}
