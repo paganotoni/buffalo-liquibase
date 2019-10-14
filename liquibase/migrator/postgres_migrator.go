@@ -7,6 +7,8 @@ import (
 	_ "github.com/lib/pq"
 	"github.com/paganotoni/buffalo-liquibase/liquibase/models"
 	"github.com/pkg/errors"
+
+	"github.com/paganotoni/buffalo-liquibase/liquibase/models"
 )
 
 // PostgresMigrator interface check
@@ -41,6 +43,8 @@ const (
 	`
 
 	lockStatement = "INSERT INTO databasechangeloglock (id, locked, lockedby) VALUES (?, ?, ?)"
+
+	migrationsLogs = "SELECT * FROM databasechangelog"
 )
 
 // PostgresMigrator is the implementation of the migrator for the postgres
@@ -81,6 +85,15 @@ func (pm PostgresMigrator) lock() error {
 	return pm.Conn.Transaction(func(tx *pop.Connection) error {
 		return tx.RawQuery(lockStatement, os.Getpid(), true, "buffalo-liquibase").Exec()
 	})
+}
+
+func (pm PostgresMigrator) getMigrationLogs() (models.MigrationLogs, error) {
+	mlogs := models.MigrationLogs{}
+	err := pm.Conn.Transaction(func(tx *pop.Connection) error {
+		return tx.All(&mlogs)
+	})
+
+	return mlogs, err
 }
 
 func (pm PostgresMigrator) Prepare() error {
