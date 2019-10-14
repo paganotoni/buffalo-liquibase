@@ -1,5 +1,5 @@
 package models
 
 type Include struct {
-	File string
+	File string `xml:"file,attr"`
 }

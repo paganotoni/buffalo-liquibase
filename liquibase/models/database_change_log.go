@@ -13,7 +13,8 @@ type DatabaseChangeLog struct {
 	SchemaLocation string   `xml:"xsi:schemaLocation,attr"`
 
 	//Attributes
-	ChangeSet  ChangeSet    `xml:"changeSet"`
-	Include    []Include    `xml:"include"`
-	IncludeAll []IncludeAll `xml:"includeAll"`
+	ChangeSet ChangeSet `xml:"changeSet"`
+	Include   []Include `xml:"include"`
+
+	// IncludeAll []IncludeAll `xml:"includeAll"`
 }

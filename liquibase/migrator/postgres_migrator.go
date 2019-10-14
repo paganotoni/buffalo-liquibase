@@ -5,6 +5,7 @@ import (
 
 	"github.com/gobuffalo/pop"
 	_ "github.com/lib/pq"
+	"github.com/paganotoni/buffalo-liquibase/liquibase/models"
 	"github.com/pkg/errors"
 )
 
@@ -47,6 +48,8 @@ const (
 // kind of migrators but i preffer to leave the door open.
 type PostgresMigrator struct {
 	Conn *pop.Connection
+
+	log models.DatabaseChangeLog
 }
 
 func (pm PostgresMigrator) ensureTables() error {
@@ -118,7 +121,7 @@ func (pm PostgresMigrator) Up() error {
 	return nil
 }
 
-func (pm PostgresMigrator) Down() error {
+func (pm PostgresMigrator) Down(count int) error {
 	//Run migrations down
 	return nil
 }
