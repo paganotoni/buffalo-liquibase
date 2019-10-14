@@ -2,11 +2,14 @@ package migrator
 
 import (
 	"testing"
+	"time"
 
 	"github.com/gobuffalo/nulls"
 	"github.com/gobuffalo/pop"
 	"github.com/gobuffalo/suite"
 	"github.com/stretchr/testify/require"
+
+	"github.com/paganotoni/buffalo-liquibase/liquibase/models"
 )
 
 type PostgresSuite struct {
@@ -111,4 +114,31 @@ func (ps PostgresSuite) Test_Unlock() {
 	err = ps.DB.RawQuery("SELECT count(*) FROM databasechangeloglock;").First(&result)
 	ps.NoError(err)
 	ps.Equal(0, result.Count)
+}
+
+func (ps PostgresSuite) Test_GetMigrationLogs() {
+	log := models.MigrationLog{
+		ID:            "20190625162047-add_uuid_extension",
+		Author:        "buffalo-liquibase",
+		Filename:      "/migrations/schema/20190625162047-add_uuid_extension.xml",
+		DateExecuted:  time.Now(),
+		OrderExecuted: 1,
+		ExecType:      "EXECUTED",
+		MD5Sum:        nulls.NewString("8:6b44712359cb1cea8882505ea4ce8649"),
+		Description:   nulls.NewString("sql"),
+		Comments:      nulls.NewString(""),
+		Tag:           nulls.NewString(""),
+		Liquibase:     nulls.NewString("3.8.0"),
+		Contexts:      nulls.NewString(""),
+		Labels:        nulls.NewString(""),
+		DeploymentID:  nulls.NewString("9354664289"),
+	}
+	ps.DB.Create(&log)
+
+	logs, errLogs := ps.Migrator.getMigrationLogs()
+	ps.NoError(errLogs)
+
+	ps.Len(logs, 1)
+	ps.Equal("20190625162047-add_uuid_extension", logs[0].ID)
+	ps.Equal("buffalo-liquibase", logs[0].Author)
 }

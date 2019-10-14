@@ -41,6 +41,8 @@ const (
 	`
 
 	lockStatement = "INSERT INTO databasechangeloglock (id, locked, lockedby) VALUES (?, ?, ?)"
+
+	migrationsLogs = "SELECT * FROM databasechangelog"
 )
 
 // PostgresMigrator is the implementation of the migrator for the postgres
@@ -88,6 +90,15 @@ func (pm *PostgresMigrator) unlock() error {
 	return pm.Conn.Transaction(func(tx *pop.Connection) error {
 		return tx.RawQuery("DELETE FROM databasechangeloglock;").Exec()
 	})
+}
+
+func (pm PostgresMigrator) getMigrationLogs() (models.MigrationLogs, error) {
+	mlogs := models.MigrationLogs{}
+	err := pm.Conn.Transaction(func(tx *pop.Connection) error {
+		return tx.All(&mlogs)
+	})
+
+	return mlogs, err
 }
 
 func (pm *PostgresMigrator) Prepare() error {
