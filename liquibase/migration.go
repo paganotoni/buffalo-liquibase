@@ -8,6 +8,8 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+
+	"github.com/paganotoni/buffalo-liquibase/liquibase/models"
 )
 
 type Migration struct {
@@ -20,8 +22,8 @@ type Migration struct {
 }
 
 func (m *Migration) XML() (string, error) {
-	result, err := xml.MarshalIndent(databaseChangeLog{
-		ChangeSet: changeSet{
+	result, err := xml.MarshalIndent(models.DatabaseChangeLog{
+		ChangeSet: models.ChangeSet{
 			Author:  "buffalo-liquibase",
 			ID:      fmt.Sprintf("%v-%v", m.Version, m.Name),
 			UpSQL:   m.UpSQL,

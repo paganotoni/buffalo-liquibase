@@ -2,12 +2,9 @@ package cmd
 
 import (
 	"errors"
-	"os"
 	"os/exec"
-	"strconv"
 
 	"github.com/gobuffalo/pop"
-	"github.com/paganotoni/buffalo-liquibase/liquibase"
 	"github.com/spf13/cobra"
 )
 
@@ -27,24 +24,8 @@ var downCmd = &cobra.Command{
 			return err
 		}
 
-		runArgs, err := liquibase.BuildRunArgsFor(environment)
-		if err != nil {
-			return err
-		}
-
-		runArgs = append(runArgs, []string{
-			"--changeLogFile=" + changeLogFile,
-			"rollbackCount",
-			strconv.Itoa(rollbackCount),
-		}...)
-
-		cmd.Println(runArgs)
-
-		c := exec.Command("liquibase", runArgs...)
-		c.Stdin = os.Stdin
-		c.Stderr = os.Stderr
-		c.Stdout = os.Stdout
-		return c.Run()
+		//TODO: Run migrations down
+		return nil
 	},
 }
 

@@ -1,0 +1,13 @@
+FROM gobuffalo/buffalo:v0.14.10
+
+ENV GO111MODULE=on
+ENV GOPROXY=https://proxy.golang.org
+
+# 2345672
+# RUN buffalo new app --skip-webpack 
+# WORKDIR /go/src/app
+# RUN buffalo plugins install github.com/paganotoni/buffalo-liquibase
+
+WORKDIR /go/src/github.com/paganotoni/buffalo-liquibase
+ADD . .
+RUN service postgresql start && go test -v ./...

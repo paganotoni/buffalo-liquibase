@@ -21,12 +21,8 @@ var liquibaseCmd = &cobra.Command{
 			env = defaults.String(os.Getenv("GO_ENV"), env)
 		}
 
-		setConfigLocation()
+		pop.LoadConfigFile()
 	},
-}
-
-func setConfigLocation() {
-	pop.LoadConfigFile()
 }
 
 func init() {

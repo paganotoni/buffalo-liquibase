@@ -33,15 +33,7 @@ var testCmd = &cobra.Command{
 		}
 
 		environment = "test"
-		up, err := buildUpCommand()
-		if err != nil {
-			return err
-		}
-
-		err = up.Run()
-		if err != nil {
-			return err
-		}
+		//TODO: run migrations up
 
 		os.Setenv("GO_ENV", "test")
 
