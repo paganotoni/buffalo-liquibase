@@ -12,12 +12,13 @@ import (
 	"github.com/gobuffalo/fizz"
 	"github.com/gobuffalo/fizz/translators"
 	"github.com/pkg/errors"
+	"github.com/paganotoni/buffalo-liquibase/models"
 )
 
 //Translator takes the job of translating fizz migrations
 type Translator struct {
 	path       string
-	migrations []Migration
+	migrations []models.Migration
 }
 
 func NewTranslator(path string) Translator {
@@ -101,7 +102,7 @@ func (t *Translator) LoadMigrations() {
 			return nil
 		}
 
-		mf := Migration{
+		mf := models.Migration{
 			Version: m[1],
 			Name:    m[2],
 			Type:    m[5],

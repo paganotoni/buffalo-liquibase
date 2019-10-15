@@ -6,8 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/paganotoni/buffalo-liquibase/liquibase"
-
+	"github.com/paganotoni/buffalo-liquibase/models"
 	"github.com/spf13/cobra"
 )
 
@@ -23,7 +22,7 @@ var generateCmd = &cobra.Command{
 			return errors.New("You must provide a name for the migration")
 		}
 		nameParts := strings.Split(args[0], "/")
-		migration := liquibase.Migration{
+		migration := models.Migration{
 			Name:    nameParts[len(nameParts)-1],
 			Version: time.Now().UTC().Format("20060102150405"),
 		}

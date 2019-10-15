@@ -1,4 +1,4 @@
-package liquibase
+package models
 
 import (
 	"encoding/xml"
