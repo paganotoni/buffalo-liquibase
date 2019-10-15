@@ -1,4 +1,4 @@
-package models
+package liquibase
 
 import "html/template"
 

@@ -6,8 +6,8 @@ import (
 	"github.com/gobuffalo/nulls"
 )
 
-// MigrationLog ...
-type MigrationLog struct {
+// ChangeLog ...
+type ChangeLog struct {
 	ID            string       `db:"id"`
 	Author        string       `db:"author"`
 	Filename      string       `db:"filename"`
@@ -25,9 +25,9 @@ type MigrationLog struct {
 }
 
 // MigrationLogs ...
-type MigrationLogs []MigrationLog
+type ChangeLogs []ChangeLog
 
 // TableName function ...
-func (ml MigrationLog) TableName() string {
+func (ml ChangeLog) TableName() string {
 	return "databasechangelog"
 }

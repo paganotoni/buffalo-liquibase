@@ -5,7 +5,8 @@ import (
 
 	"github.com/gobuffalo/pop"
 	_ "github.com/lib/pq"
-	"github.com/paganotoni/buffalo-liquibase/liquibase/models"
+	"github.com/paganotoni/buffalo-liquibase/models"
+	"github.com/paganotoni/buffalo-liquibase/models/liquibase"
 	"github.com/pkg/errors"
 )
 
@@ -41,8 +42,6 @@ const (
 	`
 
 	lockStatement = "INSERT INTO databasechangeloglock (id, locked, lockedby) VALUES (?, ?, ?)"
-
-	migrationsLogs = "SELECT * FROM databasechangelog"
 )
 
 // PostgresMigrator is the implementation of the migrator for the postgres
@@ -52,7 +51,10 @@ type PostgresMigrator struct {
 	Conn *pop.Connection
 
 	changelogPath string
-	log           models.DatabaseChangeLog
+	changelog     liquibase.ChangeLog
+
+	//Holds the list of migrations that have already run from the database.
+	databaseChangelog models.ChangeLogs
 }
 
 func (pm *PostgresMigrator) ensureTables() error {
@@ -92,8 +94,8 @@ func (pm *PostgresMigrator) unlock() error {
 	})
 }
 
-func (pm PostgresMigrator) getMigrationLogs() (models.MigrationLogs, error) {
-	mlogs := models.MigrationLogs{}
+func (pm PostgresMigrator) getMigrationLogs() (models.ChangeLogs, error) {
+	mlogs := models.ChangeLogs{}
 	err := pm.Conn.Transaction(func(tx *pop.Connection) error {
 		return tx.All(&mlogs)
 	})
@@ -133,7 +135,7 @@ func (pm *PostgresMigrator) Up() error {
 	}
 
 	//4. Parse migration changelog
-	pm.log, err = Parser{}.ParseXML(pm.changelogPath)
+	pm.changelog, err = Parser{}.ParseXML(pm.changelogPath)
 	if err != nil {
 		return errors.Wrap(err, "error reading changelog")
 	}

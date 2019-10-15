@@ -1,10 +1,10 @@
-package models
+package liquibase
 
 import (
 	"encoding/xml"
 )
 
-type DatabaseChangeLog struct {
+type ChangeLog struct {
 	//General XML things
 	XMLName        xml.Name `xml:"databaseChangeLog"`
 	Ns             string   `xml:"xmlns,attr"`

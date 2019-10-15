@@ -9,7 +9,7 @@ import (
 	"github.com/gobuffalo/suite"
 	"github.com/stretchr/testify/require"
 
-	"github.com/paganotoni/buffalo-liquibase/liquibase/models"
+	"github.com/paganotoni/buffalo-liquibase/models"
 )
 
 type PostgresSuite struct {
@@ -117,7 +117,7 @@ func (ps PostgresSuite) Test_Unlock() {
 }
 
 func (ps PostgresSuite) Test_GetMigrationLogs() {
-	log := models.MigrationLog{
+	log := models.ChangeLog{
 		ID:            "20190625162047-add_uuid_extension",
 		Author:        "buffalo-liquibase",
 		Filename:      "/migrations/schema/20190625162047-add_uuid_extension.xml",

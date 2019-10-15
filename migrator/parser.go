@@ -5,14 +5,14 @@ import (
 	"io/ioutil"
 	"os"
 
-	"github.com/paganotoni/buffalo-liquibase/liquibase/models"
+	"github.com/paganotoni/buffalo-liquibase/models/liquibase"
 )
 
 type Parser struct{}
 
-func (p Parser) ParseXML(path string) (models.DatabaseChangeLog, error) {
+func (p Parser) ParseXML(path string) (liquibase.ChangeLog, error) {
 
-	result := models.DatabaseChangeLog{}
+	result := liquibase.ChangeLog{}
 
 	file, err := os.Open(path)
 	if err != nil {
