@@ -94,13 +94,13 @@ func (pm *PostgresMigrator) unlock() error {
 	})
 }
 
-func (pm PostgresMigrator) getMigrationLogs() (models.ChangeLogs, error) {
+func (pm *PostgresMigrator) loadDatabaseChangelog() error {
 	mlogs := models.ChangeLogs{}
-	err := pm.Conn.Transaction(func(tx *pop.Connection) error {
-		return tx.All(&mlogs)
-	})
 
-	return mlogs, err
+	err := pm.Conn.All(&mlogs)
+	pm.databaseChangelog = mlogs
+
+	return err
 }
 
 func (pm *PostgresMigrator) Prepare() error {
@@ -113,12 +113,11 @@ func (pm *PostgresMigrator) Prepare() error {
 }
 
 func (pm *PostgresMigrator) Up() error {
-	//1. Run Prepare
+
 	if err := pm.Prepare(); err != nil {
 		return err
 	}
 
-	//2. Ensure we can proceed (no lock)
 	proceed, err := pm.canMigrate()
 	if err != nil {
 		return err
@@ -128,22 +127,25 @@ func (pm *PostgresMigrator) Up() error {
 		return errors.New("Database is locked by another Liquibase process at this time, migrations cannot run")
 	}
 
-	//3. Acquire lock in table (write it)
-	err = pm.lock()
-	if err != nil {
-		return errors.Wrap(err, "error while locking")
-	}
-
-	//4. Parse migration changelog
 	pm.changelog, err = Parser{}.ParseXML(pm.changelogPath)
 	if err != nil {
 		return errors.Wrap(err, "error reading changelog")
 	}
 
-	//5. Find last migration
-	//6. Run missing and add to migrations registry
+	err = pm.loadDatabaseChangelog()
+	if err != nil {
+		return err
+	}
 
-	//7. Unlocking tables
+	err = pm.lock()
+	if err != nil {
+		return errors.Wrap(err, "error while locking")
+	}
+
+	//Find last migration
+	//Run missing and add to migrations registry
+
+	//Unlocking tables
 	return pm.unlock()
 }
 

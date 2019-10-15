@@ -135,10 +135,11 @@ func (ps PostgresSuite) Test_GetMigrationLogs() {
 	}
 	ps.DB.Create(&log)
 
-	logs, errLogs := ps.Migrator.getMigrationLogs()
+	errLogs := ps.Migrator.loadDatabaseChangelog()
 	ps.NoError(errLogs)
 
-	ps.Len(logs, 1)
-	ps.Equal("20190625162047-add_uuid_extension", logs[0].ID)
-	ps.Equal("buffalo-liquibase", logs[0].Author)
+	ps.Len(ps.Migrator.databaseChangelog, 1)
+
+	ps.Equal("20190625162047-add_uuid_extension", ps.Migrator.databaseChangelog[0].ID)
+	ps.Equal("buffalo-liquibase", ps.Migrator.databaseChangelog[0].Author)
 }
