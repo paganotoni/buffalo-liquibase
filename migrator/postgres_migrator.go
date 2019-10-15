@@ -137,16 +137,36 @@ func (pm *PostgresMigrator) Up() error {
 		return err
 	}
 
-	err = pm.lock()
-	if err != nil {
-		return errors.Wrap(err, "error while locking")
+	//Get missing migrations
+	//Find last order executed number
+
+	// err = pm.lock()
+	// if err != nil {
+	// 	return errors.Wrap(err, "error while locking")
+	// }
+
+	// //Unlocking tables
+	// pm.unlock()
+	return nil
+}
+
+func (pm *PostgresMigrator) pendingMigrations() models.ChangeLogs {
+	pending := models.ChangeLogs{}
+
+xml:
+	for _, cl := range pm.changelog.Include {
+		for _, db := range pm.databaseChangelog {
+			if cl.File == db.Filename {
+				continue xml
+			}
+		}
+
+		pending = append(pending, models.ChangeLog{
+			Filename: cl.File,
+		})
 	}
 
-	//Find last migration
-	//Run missing and add to migrations registry
-
-	//Unlocking tables
-	return pm.unlock()
+	return pending
 }
 
 func (pm *PostgresMigrator) Down(count int) error {

@@ -1,6 +1,8 @@
 package migrator
 
 import (
+	"os"
+	"path/filepath"
 	"testing"
 	"time"
 
@@ -28,6 +30,13 @@ func TestPostgres(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+
+	err = os.Mkdir("migrations", 0777)
+	if err != nil {
+		t.Fail()
+		return
+	}
+	defer os.RemoveAll("migrations")
 
 	pop.Connections["test"] = conn
 
@@ -142,4 +151,46 @@ func (ps PostgresSuite) Test_GetMigrationLogs() {
 
 	ps.Equal("20190625162047-add_uuid_extension", ps.Migrator.databaseChangelog[0].ID)
 	ps.Equal("buffalo-liquibase", ps.Migrator.databaseChangelog[0].Author)
+}
+
+func (ps PostgresSuite) Test_PendingMigrations() {
+	path := filepath.Join("migrations", "changelog.xml")
+
+	f, err := os.Create(path)
+	ps.NoError(err)
+
+	baseXML := `
+	<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+		<include file="migrations/schema/20190625162047-add_uuid_extension.xml" />
+		<include file="migrations/schema/20190625162553-create_devices.xml" />
+	</databaseChangeLog>
+	`
+	_, err = f.Write([]byte(baseXML))
+	ps.NoError(err)
+
+	ps.NoError(ps.Migrator.Prepare())
+	err = ps.Migrator.loadDatabaseChangelog()
+	ps.NoError(err)
+
+	ps.Migrator.changelog, err = Parser{}.ParseXML("migrations/changelog.xml")
+	ps.NoError(err)
+
+	chl := ps.Migrator.pendingMigrations()
+	ps.Len(chl, 2)
+
+	ps.Migrator.databaseChangelog = append(ps.Migrator.databaseChangelog, models.ChangeLog{
+		Filename: "migrations/schema/20190625162553-create_devices.xml",
+	})
+
+	chl = ps.Migrator.pendingMigrations()
+	ps.Len(chl, 1)
+
+	ps.Migrator.databaseChangelog = models.ChangeLogs{
+		{Filename: "migrations/schema/20190625162553-create_devices_non_in_the_list.xml"},
+	}
+
+	chl = ps.Migrator.pendingMigrations()
+	ps.Len(chl, 2)
+
 }
